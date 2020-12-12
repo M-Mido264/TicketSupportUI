@@ -1,1 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+.mat-form-field {
+    display: block !important;
+}
+.text-danger{
+    color: red;
+    display: block;
+}

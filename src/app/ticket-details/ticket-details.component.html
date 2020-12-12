@@ -1,0 +1,70 @@
+<div class="container">
+    <form #Form="ngForm">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Name</label>
+          <input type="text" class="form-control" (change)="Ticket.Name=Ticket.Name.trim()" minlength="2" maxlength="100" #Name="ngModel" required id="exampleInputEmail1" placeholder="Name" name="Name" [(ngModel)]="Ticket.Name">
+          <span class="text-danger" *ngIf="submitted && Name?.errors?.required">Name required</span>
+          <span class="text-danger"
+            *ngIf="submitted && Name?.errors?.minlength">Min 2 characters</span>
+          <span class="text-danger"
+            *ngIf="submitted && Name?.errors?.maxlength">Max 100 characters</span>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">User</label>
+          <select name="User" class="form-control" required [(ngModel)]="Ticket.UserId" #User="ngModel" name="User">
+              <option *ngFor="let item of Users" [value]="item.Id">{{item.Name}}</option>
+          </select>
+          <span class="text-danger" *ngIf="submitted && User?.errors?.required">User required</span>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Status</label>
+          <select name="Status" class="form-control" required #Status="ngModel" [(ngModel)]="Ticket.Status" name="status">
+            <option [value]="1">
+              New</option>
+            <option [value]="2">
+              Active</option>
+            <option [value]="3">
+              Resolved</option>
+            <option [value]="4">
+              Closed</option>
+          </select>
+          <span class="text-danger" *ngIf="submitted && Status?.errors?.required">Status required</span>
+        </div>
+        <div class="form-group">
+          <label class="form-check-label" for="exampleCheck1">Content</label>
+          <textarea [(ngModel)]="Ticket.Content" required #Content="ngModel" class="form-control" name="content"></textarea>
+          <span class="text-danger" *ngIf="submitted && Content?.errors?.required">Content required</span>
+        </div>
+        <div class="form-group">
+          <label class="form-check-label" for="created">Created at : {{Ticket.CreatedAt | date:'dd/MM/yyy'}}</label>
+        </div>
+        <div class="form-group" *ngIf="Ticket.LastStatusChanges">
+          <label class="form-check-label" for="created">Last Status Changes : {{Ticket.LastStatusChanges | date:'dd/MM/yyy'}}</label>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="Form.invalid || InProgress" (click)="save()">Edit</button> &nbsp;
+        <button type="submit" class="btn btn-secondary" [disabled]="InProgress" (click)="Logs()">View Logs</button>
+      </form>
+      <br>
+      <b *ngIf="TicketLogs.length == 0 && LogProgress">There is no logs</b>
+      <div *ngIf="TicketLogs.length > 0">
+          <table>
+              <tr>
+                  <th>Action</th>
+                  <th>Date</th>
+                  <th>User</th>
+              </tr>
+              <tr *ngFor="let item of TicketLogs">
+                  <td>
+                      {{item.Action}}
+                  </td>
+                  <td>
+                      {{item.DateTime | date:'dd/MM/yyy'}}
+                  </td>
+                  <td>
+                      {{getUserName(item.UserId)}}
+                  </td>
+              </tr>
+          </table>
+      </div>
+</div>
+

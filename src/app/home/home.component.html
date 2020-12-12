@@ -1,0 +1,153 @@
+<nav class="navbar navbar-dark bg-dark">
+    <!-- Navbar content -->
+    <a class="navbar-brand text-white">Tickts</a>
+    <button class="btn btn-primary my-2 my-sm-0" (click)="onLogout()">Logout</button>
+  </nav>
+
+  <div class="addBtn">
+    <button class="btn btn-primary my-2 my-sm-0" (click)="open(content)">+New Task</button>
+  </div>
+
+  <div class="card-container">
+    <div class="row">
+      <div class="col-md-4">
+        <input class="form-control" (keyup)="FilterByName($event.target.value)" placeholder="filter using name">
+      </div>
+
+      <div class="col-md-4">
+        <select name="Statusss" class="form-control" [(ngModel)]="filteruser" (ngModelChange)="FilterByStatus($event)">
+          <option [value]="null" selected disabled>filter by status</option>
+          <option [value]="0">
+            All</option>
+          <option [value]="1">
+            New</option>
+          <option [value]="2">
+            Active</option>
+          <option [value]="3">
+            Resolved</option>
+          <option [value]="4">
+            Closed</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <select name="Userss" class="form-control" aria-placeholder="filter by users" [(ngModel)]="filter" (ngModelChange)="FilterByUser($event)">
+          <option [value]="null" selected disabled>filter by user</option>
+          <option [value]="0">
+            All</option>
+         <option *ngFor="let item of Users" [value]="item.Id">{{item.Name}}</option>
+        </select>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class="row" *ngFor="let item of Tickets">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{item.Name}}</h5>
+            <p class="card-text">{{item.Content}}</p>
+            <p class="card-text"><span>Assigned to</span> {{getUserName(item.UserId)}}</p>
+            <p class="card-text"><span>Status</span> {{getStatusName(item.Status)}}</p>
+            <a [routerLink]="['/ticket/', item.Id]" class="card-link">Card Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+   
+  </div>
+
+
+  <ng-template #content let-modal>
+    <h2 mat-dialog-title>
+      <div class="row">
+        <div class="col col-md-11">
+          <h4 class="modal-title" id="modal-basic-title">Add new ticket
+          </h4>
+        </div>
+        <div class="col col-md-1">
+          <button type="button" class="close" aria-label="Close" (click)="cancelDialog()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+  
+    </h2>
+  
+    <mat-dialog-content>
+      <form class="form-horizontal" #Form="ngForm">
+        <div class="row form-group">
+          <div class="col-12 col-md-6">
+            <mat-form-field class="example-full-width">
+              <input matInput (change)="Ticket.Name=Ticket.Name.trim()" minlength="2" maxlength="100"
+                autocomplete="off" type="text" appTrimInput id="Name" placeholder="Name"
+                #Name="ngModel" name="Name" [(ngModel)]="Ticket.Name" required>
+            </mat-form-field>
+            <span class="text-danger" *ngIf="submitted && Name?.errors?.required">Name required</span>
+            <span class="text-danger"
+              *ngIf="submitted && Name?.errors?.minlength">Min 2 characters</span>
+            <span class="text-danger"
+              *ngIf="submitted && Name?.errors?.maxlength">Max 100 characters</span>
+          </div>
+
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-label>Status</mat-label>
+              <mat-select ref-Stat="ngModel" name="Stat" [(ngModel)]="Ticket.Status" required>
+                <mat-option  [value]="1">
+                New</mat-option>
+                <mat-option  [value]="2">
+                Active</mat-option>
+                <mat-option  [value]="3">
+                Resolved</mat-option>
+                <mat-option  [value]="4">
+                Closed</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <span class="text-danger" *ngIf="submitted && Stat?.errors?.required">Status required</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-label>User</mat-label>
+              <mat-select ref-User="ngModel" name="User" [(ngModel)]="Ticket.UserId" required>
+                <mat-option *ngFor="let item of Users" [value]="item.Id">
+                {{item.Name}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <span class="text-danger" *ngIf="submitted && User?.errors?.required">User required</span>
+          </div>
+
+            <div class="col-md-6">
+              <mat-form-field class="example-full-width">
+                <mat-label>Content</mat-label>
+                <textarea matInput maxlength="1000" placeholder="Content" name="Content"
+                  #Content="ngModel" cdkTextareaAutosize minlength="2" maxlength="200" appTrimInput
+                  cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" required [(ngModel)]="Ticket.Content"></textarea>
+              </mat-form-field>
+              <span class="text-danger" *ngIf="submitted && Content?.errors?.required">Content required</span>
+            </div>
+        </div>
+  
+         
+      </form>
+    </mat-dialog-content>
+  
+    <mat-dialog-actions>
+      <div class="ui-helper-clearfix">
+        <button mat-raised-button color="primary" class="btn  " [disabled]="InProgress"
+           type="button" (click)="save()">
+          <i *ngIf="InProgress" class="fa fa-spin fa-spinner"></i>
+          <i class="fa fa-star"></i> Save
+        </button>
+       
+        <button mat-raised-button color="warn" type="reset" class="btn " (click)="cancelDialog()">
+          <i class="fa fa-ban"></i> Cancel
+        </button>
+      </div>
+    </mat-dialog-actions>
+  </ng-template>
+
+
